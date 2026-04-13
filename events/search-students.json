@@ -1,0 +1,10 @@
+{
+  "httpMethod": "GET",
+  "path": "/students",
+  "queryStringParameters": {
+    "term": "Garcia",
+    "status": "active",
+    "limit": "10",
+    "offset": "0"
+  }
+}

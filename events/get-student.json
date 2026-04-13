@@ -1,0 +1,7 @@
+{
+  "httpMethod": "GET",
+  "path": "/students/1",
+  "pathParameters": {
+    "id": "1"
+  }
+}

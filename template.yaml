@@ -1,0 +1,119 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: School API - Student CRUD (Node.js + Lambda + API Gateway)
+
+Globals:
+  Function:
+    Runtime: nodejs20.x
+    Timeout: 15
+    MemorySize: 256
+    Environment:
+      Variables:
+        DB_HOST: !Ref DbHost
+        DB_PORT: !Ref DbPort
+        DB_NAME: !Ref DbName
+        DB_USER: !Ref DbUser
+        DB_PASSWORD: !Ref DbPassword
+
+Parameters:
+  DbHost:
+    Type: String
+    Default: "localhost"
+    Description: MySQL host (RDS endpoint in production)
+  DbPort:
+    Type: String
+    Default: "3306"
+  DbName:
+    Type: String
+    Default: "school_db"
+  DbUser:
+    Type: String
+    Default: "school_user"
+  DbPassword:
+    Type: String
+    Default: "school_pass"
+    NoEcho: true
+
+Resources:
+  # ── API Gateway ─────────────────────────────
+  SchoolApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: school-api
+      StageName: dev
+      Cors:
+        AllowOrigin: "'*'"
+        AllowMethods: "'GET, POST, PUT, DELETE, OPTIONS'"
+        AllowHeaders: "'Content-Type, Authorization'"
+
+  # ── Lambda Functions ────────────────────────
+
+  CreateStudentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: school-create-student
+      Handler: src/handlers/create-student.handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SchoolApi
+            Path: /students
+            Method: POST
+
+  GetStudentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: school-get-student
+      Handler: src/handlers/get-student.handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SchoolApi
+            Path: /students/{id}
+            Method: GET
+
+  SearchStudentsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: school-search-students
+      Handler: src/handlers/search-students.handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SchoolApi
+            Path: /students
+            Method: GET
+
+  UpdateStudentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: school-update-student
+      Handler: src/handlers/update-student.handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SchoolApi
+            Path: /students/{id}
+            Method: PUT
+
+  DeleteStudentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: school-delete-student
+      Handler: src/handlers/delete-student.handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SchoolApi
+            Path: /students/{id}
+            Method: DELETE
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway URL
+    Value: !Sub "https://${SchoolApi}.execute-api.${AWS::Region}.amazonaws.com/dev"

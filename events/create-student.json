@@ -1,0 +1,5 @@
+{
+  "httpMethod": "POST",
+  "path": "/students",
+  "body": "{\"first_name\":\"Test\",\"last_name_father\":\"User\",\"last_name_mother\":\"Demo\",\"date_of_birth\":\"2015-06-15\",\"gender\":\"M\",\"grade_id\":3}"
+}
