@@ -212,12 +212,53 @@ const collection = {
   ],
 };
 
+// ── Postman Environments ──────────────────
+
+const localEnv = {
+  id: "school-api-local",
+  name: "School API - Local",
+  values: [
+    { key: "base_url", value: "http://localhost:3000", enabled: true },
+    { key: "token", value: "", enabled: true },
+  ],
+};
+
+// Try to read the production URL from SAM outputs
+let prodUrl = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/dev";
+try {
+  const samConfig = readFileSync("samconfig.toml", "utf8");
+  // After first deploy, try to get the stack name to hint the user
+} catch {
+  // No deploy yet, use placeholder
+}
+
+const prodEnv = {
+  id: "school-api-production",
+  name: "School API - Production (AWS)",
+  values: [
+    { key: "base_url", value: prodUrl, enabled: true },
+    { key: "token", value: "", enabled: true },
+  ],
+};
+
+// ── Write files ───────────────────────────
+
 mkdirSync("postman", { recursive: true });
 writeFileSync(
   "postman/school-api.postman_collection.json",
   JSON.stringify(collection, null, 2)
 );
+writeFileSync(
+  "postman/local.postman_environment.json",
+  JSON.stringify(localEnv, null, 2)
+);
+writeFileSync(
+  "postman/production.postman_environment.json",
+  JSON.stringify(prodEnv, null, 2)
+);
 
 console.log(
   `Generated postman/school-api.postman_collection.json (${endpoints.length} endpoints)`
 );
+console.log("Generated postman/local.postman_environment.json");
+console.log("Generated postman/production.postman_environment.json");

@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: School API - Student CRUD with JWT Auth (Node.js + Lambda + API Gateway)
+Description: School API Node - Student CRUD + JWT Auth (Node.js + Lambda + API Gateway)
 
 Globals:
   Function:

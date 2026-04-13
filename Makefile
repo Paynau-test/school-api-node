@@ -1,5 +1,5 @@
 # ============================================
-# school-api-serverless · Makefile
+# school-api-node · Makefile
 # ============================================
 
 API_PID_FILE := .api.pid
@@ -83,7 +83,7 @@ logs-tail:
 	fi
 
 logs-aws:
-	@sam logs --stack-name school-api-serverless --tail
+	@sam logs --stack-name school-api-node --tail
 
 # ── Build & Deploy ──────────────────────────
 
@@ -117,11 +117,30 @@ invoke-login:
 postman:
 	@node scripts/generate-postman.js
 
+postman-prod:
+	@echo "Reading API URL from deployed stack..."
+	@API_URL=$$(aws cloudformation describe-stacks \
+		--stack-name school-api-node \
+		--query 'Stacks[0].Outputs[?OutputKey==`ApiUrl`].OutputValue' \
+		--output text 2>/dev/null) && \
+	if [ -n "$$API_URL" ] && [ "$$API_URL" != "None" ]; then \
+		node scripts/generate-postman.js && \
+		node -e " \
+			const fs = require('fs'); \
+			const env = JSON.parse(fs.readFileSync('postman/production.postman_environment.json')); \
+			env.values.find(v => v.key === 'base_url').value = '$$API_URL'; \
+			fs.writeFileSync('postman/production.postman_environment.json', JSON.stringify(env, null, 2)); \
+			console.log('Production URL set to: $$API_URL'); \
+		"; \
+	else \
+		echo "Stack not deployed yet. Run: make deploy"; \
+	fi
+
 # ── Help ────────────────────────────────────
 
 help:
 	@echo ""
-	@echo "school-api-serverless commands:"
+	@echo "school-api-node commands:"
 	@echo ""
 	@echo "  make dev            Start API in background (no terminal lock)"
 	@echo "  make stop           Stop the background API"
@@ -141,4 +160,5 @@ help:
 	@echo "  make invoke-get     Test get-student locally"
 	@echo "  make invoke-search  Test search-students locally"
 	@echo "  make postman        Regenerate Postman collection"
+	@echo "  make postman-prod   Same + fetch production URL from AWS"
 	@echo ""

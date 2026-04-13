@@ -1,7 +1,7 @@
 {
-  "name": "school-api-serverless",
+  "name": "school-api-node",
   "version": "1.0.0",
-  "description": "Serverless API for student CRUD operations (Node.js + Lambda + API Gateway)",
+  "description": "School API - Student CRUD + Auth (Node.js + Lambda + API Gateway)",
   "type": "module",
   "scripts": {
     "dev": "sam local start-api --warm-containers eager",
