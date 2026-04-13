@@ -1,7 +1,8 @@
 import { callProcedure } from "../lib/db.js";
+import { withAuth } from "../lib/auth.js";
 import { success, notFound, error, serverError } from "../lib/response.js";
 
-export async function handler(event) {
+async function getStudentHandler(event) {
   try {
     const studentId = event.pathParameters?.id;
 
@@ -21,3 +22,6 @@ export async function handler(event) {
     return serverError();
   }
 }
+
+// Both admin and teacher can view students
+export const handler = withAuth(getStudentHandler);

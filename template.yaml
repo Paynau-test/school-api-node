@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: School API - Student CRUD (Node.js + Lambda + API Gateway)
+Description: School API - Student CRUD with JWT Auth (Node.js + Lambda + API Gateway)
 
 Globals:
   Function:
@@ -14,6 +14,7 @@ Globals:
         DB_NAME: !Ref DbName
         DB_USER: !Ref DbUser
         DB_PASSWORD: !Ref DbPassword
+        JWT_SECRET: !Ref JwtSecret
 
 Parameters:
   DbHost:
@@ -33,6 +34,11 @@ Parameters:
     Type: String
     Default: "school_pass"
     NoEcho: true
+  JwtSecret:
+    Type: String
+    Default: "dev-secret-change-in-production"
+    NoEcho: true
+    Description: Secret key for JWT signing
 
 Resources:
   # ── API Gateway ─────────────────────────────
@@ -46,7 +52,35 @@ Resources:
         AllowMethods: "'GET, POST, PUT, DELETE, OPTIONS'"
         AllowHeaders: "'Content-Type, Authorization'"
 
-  # ── Lambda Functions ────────────────────────
+  # ── Auth ────────────────────────────────────
+
+  LoginFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: school-login
+      Handler: src/handlers/login.handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SchoolApi
+            Path: /auth/login
+            Method: POST
+
+  MeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: school-me
+      Handler: src/handlers/me.handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SchoolApi
+            Path: /auth/me
+            Method: GET
+
+  # ── Students CRUD ───────────────────────────
 
   CreateStudentFunction:
     Type: AWS::Serverless::Function

@@ -1,7 +1,8 @@
 import { callProcedure } from "../lib/db.js";
+import { withAuth } from "../lib/auth.js";
 import { success, error, serverError } from "../lib/response.js";
 
-export async function handler(event) {
+async function updateStudentHandler(event) {
   try {
     const studentId = event.pathParameters?.id;
     const body = JSON.parse(event.body || "{}");
@@ -44,3 +45,6 @@ export async function handler(event) {
     return serverError();
   }
 }
+
+// Only admin can update students
+export const handler = withAuth(updateStudentHandler, { roles: ["admin"] });

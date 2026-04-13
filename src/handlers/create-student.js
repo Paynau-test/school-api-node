@@ -1,7 +1,8 @@
 import { callProcedure } from "../lib/db.js";
+import { withAuth } from "../lib/auth.js";
 import { success, error, serverError } from "../lib/response.js";
 
-export async function handler(event) {
+async function createStudentHandler(event) {
   try {
     const body = JSON.parse(event.body || "{}");
 
@@ -31,3 +32,6 @@ export async function handler(event) {
     return serverError();
   }
 }
+
+// Only admin can create students
+export const handler = withAuth(createStudentHandler, { roles: ["admin"] });

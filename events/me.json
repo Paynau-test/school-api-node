@@ -1,0 +1,7 @@
+{
+  "httpMethod": "GET",
+  "path": "/auth/me",
+  "headers": {
+    "Authorization": "Bearer {{paste_token_here}}"
+  }
+}

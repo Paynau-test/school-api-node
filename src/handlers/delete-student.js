@@ -1,7 +1,8 @@
 import { callProcedure } from "../lib/db.js";
+import { withAuth } from "../lib/auth.js";
 import { success, error, serverError } from "../lib/response.js";
 
-export async function handler(event) {
+async function deleteStudentHandler(event) {
   try {
     const studentId = event.pathParameters?.id;
 
@@ -20,3 +21,6 @@ export async function handler(event) {
     return serverError();
   }
 }
+
+// Only admin can delete students
+export const handler = withAuth(deleteStudentHandler, { roles: ["admin"] });

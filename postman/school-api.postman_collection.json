@@ -1,8 +1,8 @@
 {
   "info": {
-    "name": "School API - Student CRUD",
-    "_postman_id": "school-api-v1",
-    "description": "Auto-generated from template.yaml.\nRun: make postman\n\nSwitch base_url variable between local and AWS.",
+    "name": "School API",
+    "_postman_id": "school-api-v2",
+    "description": "Auto-generated from template.yaml.\nRun: make postman\n\nFlow: 1) Login → 2) Copy token → 3) Use protected endpoints.\nSwitch base_url variable between local and AWS.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -10,11 +10,98 @@
       "key": "base_url",
       "value": "http://localhost:3000",
       "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
     }
   ],
   "item": [
     {
+      "name": "Auth",
+      "description": "Login and profile endpoints. Login first to get a JWT token.",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@school.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.success && res.data && res.data.token) {",
+                  "    pm.collectionVariables.set(\"token\", res.data.token);",
+                  "    console.log(\"Token saved to collection variable\");",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "Students",
+      "description": "Student CRUD endpoints. All require Bearer token (login first).",
       "item": [
         {
           "name": "Create Student",
@@ -24,6 +111,11 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
               }
             ],
             "url": {
@@ -45,7 +137,13 @@
           "name": "Get Student",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/students/1",
               "host": [
@@ -62,7 +160,13 @@
           "name": "Search Students",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/students",
               "host": [
@@ -102,6 +206,11 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
               }
             ],
             "url": {
@@ -124,7 +233,13 @@
           "name": "Delete Student",
           "request": {
             "method": "DELETE",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/students/1",
               "host": [

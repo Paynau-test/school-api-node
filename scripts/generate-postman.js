@@ -24,8 +24,27 @@ while ((match = functionRegex.exec(template)) !== null) {
   });
 }
 
-// Generate request body examples based on method
+// Separate auth and student endpoints
+const authEndpoints = endpoints.filter((ep) => ep.path.startsWith("/auth"));
+const studentEndpoints = endpoints.filter((ep) =>
+  ep.path.startsWith("/students")
+);
+
+// Generate request body examples based on method and path
 function getBody(method, path) {
+  if (method === "POST" && path.includes("/auth/login")) {
+    return {
+      mode: "raw",
+      raw: JSON.stringify(
+        {
+          email: "admin@school.com",
+          password: "password123",
+        },
+        null,
+        2
+      ),
+    };
+  }
   if (method === "POST" && path.includes("students")) {
     return {
       mode: "raw",
@@ -66,7 +85,7 @@ function getBody(method, path) {
 
 // Generate query params for GET list endpoints
 function getQuery(method, path) {
-  if (method === "GET" && !path.includes("{")) {
+  if (method === "GET" && !path.includes("{") && path.includes("students")) {
     return [
       { key: "term", value: "", description: "Partial name search" },
       {
@@ -90,45 +109,105 @@ function readableName(fnName) {
     .join(" ");
 }
 
+// Auth header for protected endpoints
+function authHeader() {
+  return { key: "Authorization", value: "Bearer {{token}}", type: "text" };
+}
+
+// Is this a public endpoint (no auth needed)?
+function isPublic(path) {
+  return path === "/auth/login";
+}
+
+// Build request object
+function buildRequest(ep) {
+  const resolvedPath = ep.path.replace("{id}", "1");
+  const headers = [];
+
+  if (ep.method === "POST" || ep.method === "PUT") {
+    headers.push({ key: "Content-Type", value: "application/json" });
+  }
+  if (!isPublic(ep.path)) {
+    headers.push(authHeader());
+  }
+
+  const request = {
+    method: ep.method,
+    header: headers,
+    url: {
+      raw: `{{base_url}}${resolvedPath}`,
+      host: ["{{base_url}}"],
+      path: resolvedPath.split("/").filter(Boolean),
+    },
+  };
+
+  const body = getBody(ep.method, ep.path);
+  if (body) request.body = body;
+
+  const query = getQuery(ep.method, ep.path);
+  if (query) request.url.query = query;
+
+  return request;
+}
+
 // Build Postman collection
 const collection = {
   info: {
-    name: "School API - Student CRUD",
-    _postman_id: "school-api-v1",
+    name: "School API",
+    _postman_id: "school-api-v2",
     description:
-      "Auto-generated from template.yaml.\nRun: make postman\n\nSwitch base_url variable between local and AWS.",
+      "Auto-generated from template.yaml.\nRun: make postman\n\nFlow: 1) Login → 2) Copy token → 3) Use protected endpoints.\nSwitch base_url variable between local and AWS.",
     schema:
       "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
   },
   variable: [
     { key: "base_url", value: "http://localhost:3000", type: "string" },
+    { key: "token", value: "", type: "string" },
+  ],
+  event: [
+    {
+      listen: "prerequest",
+      script: {
+        type: "text/javascript",
+        exec: [""],
+      },
+    },
   ],
   item: [
     {
-      name: "Students",
-      item: endpoints.map((ep) => {
-        const resolvedPath = ep.path.replace("{id}", "1");
-        const request = {
-          method: ep.method,
-          header:
-            ep.method === "POST" || ep.method === "PUT"
-              ? [{ key: "Content-Type", value: "application/json" }]
-              : [],
-          url: {
-            raw: `{{base_url}}${resolvedPath}`,
-            host: ["{{base_url}}"],
-            path: resolvedPath.split("/").filter(Boolean),
-          },
-        };
-
-        const body = getBody(ep.method, ep.path);
-        if (body) request.body = body;
-
-        const query = getQuery(ep.method, ep.path);
-        if (query) request.url.query = query;
-
-        return { name: readableName(ep.name), request };
+      name: "Auth",
+      description: "Login and profile endpoints. Login first to get a JWT token.",
+      item: authEndpoints.map((ep) => {
+        const item = { name: readableName(ep.name), request: buildRequest(ep) };
+        // Auto-set token variable after login
+        if (ep.path === "/auth/login" && ep.method === "POST") {
+          item.event = [
+            {
+              listen: "test",
+              script: {
+                type: "text/javascript",
+                exec: [
+                  'const res = pm.response.json();',
+                  'if (res.success && res.data && res.data.token) {',
+                  '    pm.collectionVariables.set("token", res.data.token);',
+                  '    console.log("Token saved to collection variable");',
+                  '}',
+                ],
+              },
+            },
+          ];
+        }
+        return item;
       }),
+    },
+    {
+      name: "Students",
+      description:
+        "Student CRUD endpoints. All require Bearer token (login first).",
+      item: studentEndpoints.map((ep) => ({
+        name: readableName(ep.name),
+        request: buildRequest(ep),
+      })),
     },
   ],
 };

@@ -1,0 +1,98 @@
+Initializing the lambda functions containers.
+Local image is up-to-date
+Local image is up-to-date
+Local image is up-to-date
+Using local image: public.ecr.aws/lambda/nodejs:20-rapid-x86_64.
+
+Using local image: public.ecr.aws/lambda/nodejs:20-rapid-x86_64.
+
+Mounting /Users/isaac/Documents/GitHub/Pueba tecnica Paynu/school-api-serverless as /var/task:ro,delegated, inside runtime container
+Mounting /Users/isaac/Documents/GitHub/Pueba tecnica Paynu/school-api-serverless as /var/task:ro,delegated, inside runtime container
+Using local image: public.ecr.aws/lambda/nodejs:20-rapid-x86_64.
+
+Mounting /Users/isaac/Documents/GitHub/Pueba tecnica Paynu/school-api-serverless as /var/task:ro,delegated, inside runtime container
+SAM_CONTAINER_ID: 04472c73687df9a8e658f1c5f40e23fe6b6b8bc5a43aa00331e644d819c8d71e
+SAM_CONTAINER_ID: 741a32e0712c6f97b151bb4a7288aca042b97388eac835db6d334801d50b88ea
+SAM_CONTAINER_ID: cf9c440ffca4fdc9683ffc4625f48590ae47d003c42c5b0d4a1b3cd33badd714
+Using local image: public.ecr.aws/lambda/nodejs:20-rapid-x86_64.
+
+Mounting /Users/isaac/Documents/GitHub/Pueba tecnica Paynu/school-api-serverless as /var/task:ro,delegated, inside runtime container
+SAM_CONTAINER_ID: 6c93c1bbe5c92d0482932cf2b89bf7b0b633da45e34d9cc3213e1641985420ca
+Using local image: public.ecr.aws/lambda/nodejs:20-rapid-x86_64.
+
+Mounting /Users/isaac/Documents/GitHub/Pueba tecnica Paynu/school-api-serverless as /var/task:ro,delegated, inside runtime container
+SAM_CONTAINER_ID: 293e174eee4f81d4f31623798ad4ec8056c45ed19b6ba8db01994507cb050be1
+Using local image: public.ecr.aws/lambda/nodejs:20-rapid-x86_64.
+
+Mounting /Users/isaac/Documents/GitHub/Pueba tecnica Paynu/school-api-serverless as /var/task:ro,delegated, inside runtime container
+SAM_CONTAINER_ID: 8c579d3ba2bb61f912fba15645deeae0947495c97e6bc46658aa82f8cc2311d0
+Using local image: public.ecr.aws/lambda/nodejs:20-rapid-x86_64.
+
+Mounting /Users/isaac/Documents/GitHub/Pueba tecnica Paynu/school-api-serverless as /var/task:ro,delegated, inside runtime container
+SAM_CONTAINER_ID: 57b230616bf2c2eef0e02f42aafc79701c6359b4f31b8b4dcff27ecc86d79adf
+Containers created. Waiting for readiness...
+Waiting for 7 containers to be running...
+All 7 containers running after 0.0 seconds
+All containers are ready.
+Mounting DeleteStudentFunction at http://127.0.0.1:3000/students/{id} [DELETE, OPTIONS]
+Mounting LoginFunction at http://127.0.0.1:3000/auth/login [POST, OPTIONS]
+Mounting SearchStudentsFunction at http://127.0.0.1:3000/students [GET, OPTIONS]
+Mounting GetStudentFunction at http://127.0.0.1:3000/students/{id} [GET, OPTIONS]
+Mounting CreateStudentFunction at http://127.0.0.1:3000/students [POST, OPTIONS]
+Mounting UpdateStudentFunction at http://127.0.0.1:3000/students/{id} [PUT, OPTIONS]
+Mounting MeFunction at http://127.0.0.1:3000/auth/me [GET, OPTIONS]
+You can now browse to the above endpoints to invoke your functions. You do not need to restart/reload SAM CLI while working on your functions, changes will be reflected instantly/automatically. If you used sam build before running local commands, you will need to re-run sam build for the changes to be picked up. You only need to restart SAM CLI if you update your AWS SAM template
+2026-04-13 08:13:07 [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2026-04-13 08:13:07 [33mPress CTRL+C to quit[0m
+Invoking src/handlers/me.handler (nodejs20.x)
+Using local image: public.ecr.aws/lambda/nodejs:20-rapid-x86_64.
+
+Mounting /Users/isaac/Documents/GitHub/Pueba tecnica Paynu/school-api-serverless as /var/task:ro,delegated, inside runtime container
+SAM_CONTAINER_ID: 12cb786f0b73ed9899ad934f3579055f80f2f7c9f2b6b2f8aa9104f2bbe828a6
+START RequestId: d731d9c3-4ccf-498a-af21-276422ad8d55 Version: $LATEST
+2026-04-13T13:13:11.779Z	d731d9c3-4ccf-498a-af21-276422ad8d55	ERROR	me error: Error: Bind parameters must not contain undefined. To pass SQL NULL specify JS null
+    at /var/task/node_modules/mysql2/lib/promise/make_done_cb.js:6:24
+    at /var/task/node_modules/mysql2/lib/base/pool.js:283:16
+    at /var/task/node_modules/mysql2/lib/base/pool.js:87:18
+    at PoolConnection.onConnect (/var/task/node_modules/mysql2/lib/base/connection.js:1008:7)
+    at Object.onceWrapper (node:events:639:26)
+    at PoolConnection.emit (node:events:524:28)
+    at ClientHandshake.<anonymous> (/var/task/node_modules/mysql2/lib/base/connection.js:146:14)
+    at ClientHandshake.emit (node:events:524:28)
+    at ClientHandshake.execute (/var/task/node_modules/mysql2/lib/commands/command.js:49:10)
+    at PoolConnection.handlePacket (/var/task/node_modules/mysql2/lib/base/connection.js:552:34) {
+  code: undefined,
+  errno: undefined,
+  sql: undefined,
+  sqlState: undefined,
+  sqlMessage: undefined
+}
+END RequestId: d731d9c3-4ccf-498a-af21-276422ad8d55
+REPORT RequestId: d731d9c3-4ccf-498a-af21-276422ad8d55	Init Duration: 0.29 ms	Duration: 878.24 ms	Billed Duration: 879 ms	Memory Size: 256 MB	Max Memory Used: 256 MB	
+
+2026-04-13 08:13:11 127.0.0.1 - - [13/Apr/2026 08:13:11] "[35m[1mGET /auth/me HTTP/1.1[0m" 500 -
+Invoking src/handlers/login.handler (nodejs20.x)
+Lambda function 'LoginFunction' is already running
+START RequestId: be6f32cb-eb24-4b8a-8faa-5162e3601a08 Version: $LATEST
+END RequestId: be6f32cb-eb24-4b8a-8faa-5162e3601a08
+REPORT RequestId: be6f32cb-eb24-4b8a-8faa-5162e3601a08	Init Duration: 0.70 ms	Duration: 2008.42 ms	Billed Duration: 2009 ms	Memory Size: 256 MB	Max Memory Used: 256 MB	
+
+2026-04-13 08:13:17 127.0.0.1 - - [13/Apr/2026 08:13:17] "POST /auth/login HTTP/1.1" 200 -
+Invoking src/handlers/me.handler (nodejs20.x)
+Lambda function 'MeFunction' is already running
+START RequestId: 4c072041-2725-4732-830e-58c31e437bad Version: $LATEST
+END RequestId: 4c072041-2725-4732-830e-58c31e437bad
+REPORT RequestId: 4c072041-2725-4732-830e-58c31e437bad	Duration: 39.14 ms	Billed Duration: 40 ms	Memory Size: 256 MB	Max Memory Used: 256 MB	
+
+2026-04-13 08:13:21 127.0.0.1 - - [13/Apr/2026 08:13:21] "GET /auth/me HTTP/1.1" 200 -
+Invoking src/handlers/get-student.handler (nodejs20.x)
+Using local image: public.ecr.aws/lambda/nodejs:20-rapid-x86_64.
+
+Mounting /Users/isaac/Documents/GitHub/Pueba tecnica Paynu/school-api-serverless as /var/task:ro,delegated, inside runtime container
+SAM_CONTAINER_ID: ddf90d776c5b46238feab5f7514f1a6e8b046dcc11b8ba4fd987b9a6dec779eb
+START RequestId: f00899ff-55f4-482d-911d-2950292956a5 Version: $LATEST
+END RequestId: f00899ff-55f4-482d-911d-2950292956a5
+REPORT RequestId: f00899ff-55f4-482d-911d-2950292956a5	Init Duration: 0.30 ms	Duration: 858.85 ms	Billed Duration: 859 ms	Memory Size: 256 MB	Max Memory Used: 256 MB	
+
+2026-04-13 08:13:29 127.0.0.1 - - [13/Apr/2026 08:13:29] "GET /students/1 HTTP/1.1" 200 -
