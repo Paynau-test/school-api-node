@@ -1,125 +1,45 @@
 # school-api-node
 
-REST API for the school management system. Built with Node.js 20, AWS Lambda, and API Gateway using AWS SAM.
+REST API for student management (Pedido 1). Node.js 20 + AWS Lambda + API Gateway via SAM.
 
-## Requirements
-
-- Node.js 20+
-- AWS SAM CLI (`brew install aws-sam-cli`)
-- Docker (for local testing)
-- school-db running locally (`make up` in school-db)
-
-## Quick Start (Local)
+## Quick Start
 
 ```bash
 make install    # Install dependencies
-make dev        # Start API in background on http://localhost:3000
-make logs-tail  # Follow logs in real time
+make dev        # Start API on http://localhost:3000
+make logs-tail  # Follow logs
 ```
 
-Requires school-db Docker containers running. The API connects to your local MySQL on port 3306.
+Requires `school-db` running locally (`make up` in school-db).
 
 ## Endpoints
 
-All endpoints (except login) require a JWT token in the `Authorization: Bearer <token>` header.
+All endpoints except login require `Authorization: Bearer <token>`.
 
 ```
-Auth:
-  POST   /auth/login        Login (returns JWT token)
-  GET    /auth/me            Get authenticated user profile
+POST   /auth/login       Login (returns JWT)
+GET    /auth/me           Get current user
 
-Students (admin + teacher can read, only admin can write):
-  POST   /students           Create student          [admin]
-  GET    /students            Search students          [any authenticated]
-  GET    /students/{id}       Get student by ID        [any authenticated]
-  PUT    /students/{id}       Update student           [admin]
-  DELETE /students/{id}       Soft delete student      [admin]
+POST   /students          Create student        [admin]
+GET    /students           Search students        [admin + teacher]
+GET    /students/{id}      Get student by ID      [admin + teacher]
+PUT    /students/{id}      Update student         [admin]
+DELETE /students/{id}      Soft delete (inactive) [admin]
 ```
 
-## Request/Response Format
-
-All responses follow the same structure:
-
-```json
-{ "success": true, "data": { ... } }
-{ "success": false, "error": "Error message" }
-```
-
-### Login
-```bash
-curl -X POST http://localhost:3000/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@school.com","password":"password123"}'
-```
-
-### Create Student (requires admin token)
-```bash
-curl -X POST http://localhost:3000/students \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{
-    "first_name": "Juan",
-    "last_name_father": "Garcia",
-    "last_name_mother": "Lopez",
-    "date_of_birth": "2015-03-15",
-    "gender": "M",
-    "grade_id": 3
-  }'
-```
-
-### Search Students
-```bash
-curl "http://localhost:3000/students?term=Garcia&status=active" \
-  -H "Authorization: Bearer <token>"
-```
-
-## Deploy to AWS
+## Deploy
 
 ```bash
-make deploy       # Build and deploy API + Lambdas to AWS
-make db-deploy    # Run database migration on production RDS (via Lambda)
+make deploy       # Build + deploy API to AWS Lambda
+make db-deploy    # Run DB migration on production RDS
 ```
 
-`make deploy` automatically reads VPC, subnets, and DB credentials from AWS. No manual configuration needed.
-
-## Database Migrations
-
-When you change the database structure (tables, stored procedures, seeds):
-
-1. Update the individual files in `school-db/` (migrations, stored-procedures, seeds)
-2. Update `src/handlers/db-migrate.js` to match the changes
-3. Run `make deploy` then `make db-deploy`
-
-The migration Lambda is idempotent (safe to run multiple times).
+Auto-reads VPC, subnets and DB credentials from AWS. No manual config needed.
 
 ## Architecture
 
-```
-API Gateway → Lambda (VPC) → RDS MySQL (private subnet)
-                                ↑
-                        Stored Procedures
-```
-
-Each CRUD operation is a separate Lambda function. They share a MySQL connection pool (reused across warm invocations) and call stored procedures defined in school-db.
-
-## Available Commands
-
-```
-Local:
-  make install        Install dependencies
-  make dev            Start API in background (port 3000)
-  make stop           Stop background API
-  make restart        Restart API
-  make status         Check if running
-  make logs           Last 50 lines
-  make logs-tail      Follow logs in real time
-
-Production:
-  make deploy         Build and deploy to AWS
-  make db-deploy      Run DB migration on production RDS
-  make destroy        Delete the CloudFormation stack
-
-Postman:
-  make postman        Generate local Postman collection
-  make postman-prod   Generate local + production collections
-```
+- **Runtime**: Node.js 20 on AWS Lambda (one function per endpoint)
+- **Database**: MySQL 8 on RDS (via stored procedures)
+- **Auth**: JWT with BCrypt password verification
+- **Deploy**: SAM (CloudFormation)
+- **DB Migration**: Lambda inside VPC that runs DDL + seed directly on RDS
